@@ -22,7 +22,7 @@ header{height:74px;border-bottom:1px solid var(--line);background:rgba(255,255,2
 <section class="hero">
 <div class="eyebrow">Automatisch aus GitHub geladen</div>
 <h1>Alle meine Websites.<br>Ein einziger Ort.</h1>
-<p>Hier erscheinen automatisch die öffentlichen GitHub-Repositories, für die GitHub Pages aktiviert ist. Neue Pages-Projekte werden beim nächsten Laden der Seite erkannt.</p>
+<p>Hier erscheinen automatisch deine GitHub-Pages-Websites. Die neuesten Code-Änderungen stehen ganz oben. Die Liste wird bei jedem Laden direkt mit GitHub abgeglichen.</p>
 <div class="stats"><div class="stat"><strong id="count">–</strong><span>Websites gefunden</span></div><div class="stat"><strong id="repos">–</strong><span>Repositories geprüft</span></div><div class="stat"><strong>Live</strong><span>GitHub-Verzeichnis</span></div></div>
 </section>
 <section aria-label="Websites">
@@ -31,7 +31,7 @@ header{height:74px;border-bottom:1px solid var(--line);background:rgba(255,255,2
 <div class="grid" id="sites"><div class="state"><strong>Websites werden gesucht</strong>GitHub-Repositories werden geladen.</div></div>
 </section>
 </main>
-<footer class="foot"><div class="wrap footline"><span>Automatisch generiert aus den GitHub-Pages-Einstellungen.</span><a href="https://github.com/LordLOLQDH?tab=repositories" target="_blank" rel="noopener">GitHub-Profil ↗</a></div></footer>
+<footer class="foot"><div class="wrap footline"><span>Sortiert nach dem letzten Push (neueste Änderung zuerst).</span><a href="https://github.com/LordLOLQDH?tab=repositories" target="_blank" rel="noopener">GitHub-Profil ↗</a></div></footer>
 <script>
 const USER="LordLOLQDH";
 const grid=document.getElementById("sites"),statusEl=document.getElementById("status"),filterEl=document.getElementById("filter"),refreshBtn=document.getElementById("refresh");
@@ -46,7 +46,7 @@ function render(){
  const q=filterEl.value.trim().toLowerCase();
  const shown=sites.filter(s=>(s.name+" "+(s.description||"")+" "+s.language).toLowerCase().includes(q));
  document.getElementById("count").textContent=sites.length;
- grid.innerHTML=shown.length?shown.map(s=>'<article class="card"><div class="cardtop"><span class="repoicon">↗</span><span class="tag">Pages aktiv</span></div><h2>'+escapeHtml(s.name)+'</h2><p>'+escapeHtml(s.description||"Keine Beschreibung im GitHub-Repository hinterlegt.")+'</p><div class="cardbottom"><span class="updated">'+(s.language?escapeHtml(s.language)+" · ":"")+"Aktualisiert "+new Date(s.updated_at).toLocaleDateString("de-DE")+'</span><a class="visit" href="'+escapeHtml(s.url)+'" target="_blank" rel="noopener">Website öffnen ↗</a></div></article>').join(""):'<div class="state"><strong>Keine Treffer</strong>Für diese Suche wurde keine Website gefunden.</div>';
+ grid.innerHTML=shown.length?shown.map(s=>'<article class="card"><div class="cardtop"><span class="repoicon">↗</span><span class="tag">Pages aktiv</span></div><h2>'+escapeHtml(s.name)+'</h2><p>'+escapeHtml(s.description||"Keine Beschreibung im GitHub-Repository hinterlegt.")+'</p><div class="cardbottom"><span class="updated">'+(s.language?escapeHtml(s.language)+" · ":"")+"Letzte Änderung: "+new Date(s.pushed_at||s.updated_at).toLocaleDateString("de-DE")+'</span><a class="visit" href="'+escapeHtml(s.url)+'" target="_blank" rel="noopener">Website öffnen ↗</a></div></article>').join(""):'<div class="state"><strong>Keine Treffer</strong>Für diese Suche wurde keine Website gefunden.</div>';
 }
 async function load(){
  refreshBtn.disabled=true;refreshBtn.textContent="Lädt …";statusEl.textContent="Lade Repositories von GitHub …";
@@ -58,7 +58,7 @@ async function load(){
    if(!response.ok){if(response.status===403)throw new Error("GitHub begrenzt gerade die öffentlichen API-Anfragen. Bitte später erneut laden.");throw new Error("GitHub antwortet mit HTTP "+response.status+".");}
    const batch=await response.json();all=all.concat(batch);if(batch.length<100)break;page++;
   }
-  sites=all.filter(r=>r.has_pages===true&&!r.archived).map(r=>({name:r.name,description:r.description,language:r.language,updated_at:r.updated_at,url:pageUrl(r),homepage:r.homepage})).sort((a,b)=>a.name.localeCompare(b.name,"de"));
+  sites=all.filter(r=>r.has_pages===true&&!r.archived).map(r=>({name:r.name,description:r.description,language:r.language,updated_at:r.updated_at,pushed_at:r.pushed_at,url:pageUrl(r),homepage:r.homepage})).sort((a,b)=>new Date(b.pushed_at||b.updated_at)-new Date(a.pushed_at||a.updated_at));
   document.getElementById("repos").textContent=all.length;
   statusEl.textContent="Erfolgreich mit GitHub verbunden · "+sites.length+" GitHub-Pages-Websites erkannt.";
   document.getElementById("updated").textContent="Stand: "+new Date().toLocaleString("de-DE");
