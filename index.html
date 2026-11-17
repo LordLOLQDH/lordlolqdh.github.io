@@ -44,7 +44,9 @@ function pageUrl(repo){
 }
 function render(){
  const q=filterEl.value.trim().toLowerCase();
- const shown=sites.filter(s=>(s.name+" "+(s.description||"")+" "+(s.language||"")+" "+s.url).toLowerCase().includes(q));\n const mode=sortEl.value;\n shown.sort((a,b)=>mode==="az"?a.name.localeCompare(b.name,"de"):mode==="za"?b.name.localeCompare(a.name,"de"):mode==="oldest"?new Date(a.pushed_at||a.updated_at)-new Date(b.pushed_at||b.updated_at):new Date(b.pushed_at||b.updated_at)-new Date(a.pushed_at||a.updated_at));
+ const shown=sites.filter(s=>(s.name+" "+(s.description||"")+" "+(s.language||"")+" "+s.url).toLowerCase().includes(q));
+ const mode=sortEl.value;
+ shown.sort((a,b)=>mode==="az"?a.name.localeCompare(b.name,"de"):mode==="za"?b.name.localeCompare(a.name,"de"):mode==="oldest"?new Date(a.pushed_at||a.updated_at)-new Date(b.pushed_at||b.updated_at):new Date(b.pushed_at||b.updated_at)-new Date(a.pushed_at||a.updated_at));
  document.getElementById("count").textContent=sites.length;
  grid.innerHTML=shown.length?shown.map(s=>'<article class="card"><div class="cardtop"><span class="repoicon">↗</span><span class="tag">Pages aktiv</span></div><h2>'+escapeHtml(s.name)+'</h2><p>'+escapeHtml(s.description||"Keine Beschreibung im GitHub-Repository hinterlegt.")+'</p><div class="cardbottom"><span class="updated">'+(s.language?escapeHtml(s.language)+" · ":"")+"Letzte Änderung: "+new Date(s.pushed_at||s.updated_at).toLocaleDateString("de-DE")+'</span><a class="visit" href="'+escapeHtml(s.url)+'" target="_blank" rel="noopener">Website öffnen ↗</a></div></article>').join(""):'<div class="state"><strong>Keine Treffer</strong>Für diese Suche wurde keine Website gefunden.</div>';
 }
